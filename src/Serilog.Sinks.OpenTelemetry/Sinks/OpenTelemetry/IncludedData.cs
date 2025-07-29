@@ -91,4 +91,9 @@ public enum IncludedData
     /// OTLP <see cref="AnyValue.KvlistValue"/> values.
     /// </summary>
     StructureValueTypeTags = 256,
+    
+    /// <summary>
+    /// Include the short (unqualified) name of the exception type in the <c>exception.type</c> attribute when an exception is logged.
+    /// </summary>
+    ShortExceptionType = 512,
 }

@@ -170,4 +170,14 @@ public class OpenTelemetrySinkOptions
     /// <remarks>This callback accepts a <c langword="bool"/> in order to match the signature of the OpenTelemetry SDK method
     /// that is typically assigned to it. The sink always provides the callback with the value <c langword="true" />.</remarks>
     public Func<bool, IDisposable>? OnBeginSuppressInstrumentation { get; set; }
+
+
+    /// <summary>
+    /// Enables short name exception for the property <c>exception.type</c>.
+    /// When an exception is logged, the default value is <c>false</c>.
+    /// If set to <c>true</c>, the sink will use the short name of the exception type.
+    /// For example, if the exception type is <c>System.ArgumentNullException</c>,
+    /// the value of the property <c>exception.type</c> will be <c>ArgumentNullException</c>.
+    /// </summary>
+    public bool ShortNameException { get; set; } = false;
 }

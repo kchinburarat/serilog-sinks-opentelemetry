@@ -99,9 +99,41 @@ public class OtlpEventBuilderTests
             var logRecord = new LogRecord();
             var logEvent = Some.SerilogEvent(Some.TestMessageTemplate, ex: ex);
 
-            OtlpEventBuilder.ProcessException(logRecord.Attributes, logEvent);
+            OtlpEventBuilder.ProcessException(logRecord.Attributes, logEvent, IncludedData.None);
 
             var typeKeyValue = PrimitiveConversions.NewStringAttribute(TraceSemanticConventions.AttributeExceptionType, error.GetType().ToString());
+            var messageKeyValue = PrimitiveConversions.NewStringAttribute(TraceSemanticConventions.AttributeExceptionMessage, error.Message);
+
+            Assert.Equal(3, logRecord.Attributes.Count);
+            Assert.NotEqual(-1, logRecord.Attributes.IndexOf(typeKeyValue));
+            Assert.NotEqual(-1, logRecord.Attributes.IndexOf(messageKeyValue));
+
+            Assert.NotNull(ex.StackTrace);
+            if (ex.StackTrace != null)
+            {
+                var traceKeyValue = PrimitiveConversions.NewStringAttribute(TraceSemanticConventions.AttributeExceptionStacktrace, ex.ToString());
+                Assert.NotEqual(-1, logRecord.Attributes.IndexOf(traceKeyValue));
+            }
+        }
+    }
+
+    [Fact]
+    public void TestExceptionWithShortName()
+    {
+        var error = new Exception("error_message");
+
+        try
+        {
+            throw error;
+        }
+        catch (Exception ex)
+        {
+            var logRecord = new LogRecord();
+            var logEvent = Some.SerilogEvent(Some.TestMessageTemplate, ex: ex);
+
+            OtlpEventBuilder.ProcessException(logRecord.Attributes, logEvent, IncludedData.ShortExceptionType);
+
+            var typeKeyValue = PrimitiveConversions.NewStringAttribute(TraceSemanticConventions.AttributeExceptionType, error.GetType().Name.ToString());
             var messageKeyValue = PrimitiveConversions.NewStringAttribute(TraceSemanticConventions.AttributeExceptionMessage, error.Message);
 
             Assert.Equal(3, logRecord.Attributes.Count);

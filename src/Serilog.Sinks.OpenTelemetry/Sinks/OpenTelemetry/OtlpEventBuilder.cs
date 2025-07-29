@@ -38,7 +38,7 @@ static class OtlpEventBuilder
         ProcessTimestamp(logRecord, logEvent);
         ProcessBody(logRecord, logEvent, includedData, formatProvider);
         ProcessLevel(logRecord, logEvent);
-        ProcessException(logRecord.Attributes, logEvent);
+        ProcessException(logRecord.Attributes, logEvent, includedData);
         ProcessIncludedFields(logRecord, logEvent, includedData);
 
         return (logRecord, scopeName);
@@ -53,7 +53,7 @@ static class OtlpEventBuilder
         ProcessStartTime(span, logEvent);
         ProcessName(span, logEvent);
         ProcessLevel(span, logEvent);
-        ProcessException(span.Attributes, logEvent);
+        ProcessException(span.Attributes, logEvent, includedData);
         ProcessIncludedFields(span, logEvent, includedData);
         ProcessParentSpanId(span, logEvent);
         ProcessKind(span, logEvent);
@@ -156,12 +156,15 @@ static class OtlpEventBuilder
         span.Kind = PrimitiveConversions.ToOpenTelemetrySpanKind(kind);
     }
 
-    public static void ProcessException(RepeatedField<KeyValue> attrs, LogEvent logEvent)
+    public static void ProcessException(RepeatedField<KeyValue> attrs, LogEvent logEvent, IncludedData includedFields)
     {
         var ex = logEvent.Exception;
         if (ex != null)
         {
-            attrs.Add(PrimitiveConversions.NewStringAttribute(SemanticConventions.AttributeExceptionType, ex.GetType().ToString()));
+            var exceptionType = ((includedFields & IncludedData.ShortExceptionType) == IncludedData.ShortExceptionType)
+                ? ex.GetType().Name
+                : ex.GetType().ToString();
+            attrs.Add(PrimitiveConversions.NewStringAttribute(SemanticConventions.AttributeExceptionType, exceptionType));                        
 
             if (ex.Message != "")
             {
