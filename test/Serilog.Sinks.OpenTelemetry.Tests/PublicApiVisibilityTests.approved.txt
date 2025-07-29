@@ -45,7 +45,6 @@ namespace Serilog.Sinks.OpenTelemetry
         public Serilog.Sinks.OpenTelemetry.OtlpProtocol Protocol { get; set; }
         public System.Collections.Generic.IDictionary<string, object> ResourceAttributes { get; set; }
         public Serilog.Events.LogEventLevel RestrictedToMinimumLevel { get; set; }
-        public bool ShortNameException { get; set; }
         public string? TracesEndpoint { get; set; }
     }
     public enum OtlpProtocol
